@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>TAXIUMS4 – Taxi Planner & Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #020617;
+      color: #0f172a;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* GEEL THEMA */
+    :root {
+      --yellow-main: #facc15;   /* fel geel */
+      --yellow-dark: #eab308;   /* donkerder geel */
+      --yellow-soft: #fef3c7;   /* zacht geel achtergrond */
+      --bg-main: #020617;       /* donkerblauw/zwart */
+      --card-bg: #0b1120;
+      --border-soft: rgba(250, 204, 21, 0.35);
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 64px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid var(--border-soft);
+      z-index: 50;
+      backdrop-filter: blur(16px);
+    }
+
+    .logo {
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 14px;
+      color: var(--yellow-main);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .nav-link {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #e5e7eb;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+      font-size: 12px;
+    }
+
+    .nav-link:hover {
+      border-color: var(--yellow-main);
+      background: rgba(15, 23, 42, 0.9);
+      transform: translateY(-1px);
+    }
+
+    .nav-link.primary {
+      background: var(--yellow-main);
+      color: #422006;
+      font-weight: 700;
+    }
+
+    .nav-link.primary:hover {
+      background: var(--yellow-dark);
+    }
+
+    main {
+      padding: 88px 16px 40px;
+      max-width: 980px;
+      margin: 0 auto;
+      color: #e5e7eb;
+    }
+
+    section {
+      margin-bottom: 56px;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+      color: var(--yellow-soft);
+    }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 6px;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #cbd5f5;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(250, 250, 210, 0.08);
+      border: 1px solid var(--border-soft);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #fef3c7;
+      margin-bottom: 10px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--yellow-main);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.4fr);
+      gap: 24px;
+    }
+
+    .hero-left {
+      padding-right: 8px;
+    }
+
+    .hero-right {
+      display: grid;
+      grid-template-rows: auto auto;
+      gap: 14px;
+    }
+
+    .card {
+      border-radius: 18px;
+      background: radial-gradient(circle at top left, #1f2937, var(--card-bg));
+      border: 1px solid var(--border-soft);
+      padding: 16px;
+      font-size: 13px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.85);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 6px;
+      font-size: 15px;
+      color: var(--yellow-soft);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(250, 204, 21, 0.12);
+      border: 1px solid rgba(250, 204, 21, 0.5);
+      color: #fef9c3;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    /* MAP & FORM */
+    #map {
+      width: 100%;
+      height: 360px;
+      border-radius: 18px;
+      border: 1px solid var(--border-soft);
+      overflow: hidden;
+      background: #020617;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #facc15;
+      margin-bottom: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 13px;
+    }
+
+    .field label {
+      color: #e5e7eb;
+    }
+
+    .field input {
+      padding: 8px 9px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: #020617;
+      color: #f9fafb;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: var(--yellow-main);
+      box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.5);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 16px;
+      border-radius: 999px;
+      border: none;
+      background: var(--yellow-main);
+      color: #422006;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn:hover {
+      background: var(--yellow-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(250, 204, 21, 0.6);
+      color: #facc15;
+      font-weight: 500;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(250, 204, 21, 0.08);
+    }
+
+    .result {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #fef9c3;
+    }
+
+    .result span {
+      color: var(--yellow-main);
+      font-weight: 700;
+    }
+
+    /* WHATSAPP */
+    .whatsapp-bar {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .wa-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #16a34a;
+      color: #ecfdf5;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .wa-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    /* CHATBOT FLOAT */
+    .chatbot-toggle {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      background: var(--yellow-main);
+      border: 2px solid #fef9c3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+      z-index: 60;
+    }
+
+    .chatbot-toggle span {
+      font-size: 24px;
+    }
+
+    .chatbot-window {
+      position: fixed;
+      right: 16px;
+      bottom: 82px;
+      width: 320px;
+      max-height: 480px;
+      display: none;
+      flex-direction: column;
+      border-radius: 16px;
+      background: #020617;
+      border: 1px solid var(--border-soft);
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+      z-index: 60;
+    }
+
+    .chatbot-header {
+      padding: 10px 12px;
+      background: #0b1120;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .chatbot-header-title {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chatbot-header-title strong {
+      color: var(--yellow-main);
+      font-size: 13px;
+    }
+
+    .chatbot-header-title span {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .chatbot-close {
+      border: none;
+      background: transparent;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .chatbot-messages {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      max-height: 320px;
+      overflow-y: auto;
+      background: radial-gradient(circle at top, #111827, #020617 55%);
+    }
+
+    .msg {
+      max-width: 80%;
+      padding: 7px 9px;
+      border-radius: 10px;
+    }
+
+    .msg-bot {
+      align-self: flex-start;
+      background: rgba(250, 204, 21, 0.08);
+      border: 1px solid rgba(250, 204, 21, 0.45);
+      color: #fef3c7;
+    }
+
+    .msg-user {
+      align-self: flex-end;
+      background: #facc15;
+      color: #422006;
+      border-radius: 10px 10px 0 10px;
+    }
+
+    .chatbot-input-row {
+      padding: 8px;
+      border-top: 1px solid var(--border-soft);
+      background: #020617;
+      display: flex;
+      gap: 6px;
+    }
+
+    .chatbot-input-row input {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: #020617;
+      color: #e5e7eb;
+      padding: 7px 10px;
+      outline: none;
+      font-size: 13px;
+    }
+
+    .chatbot-input-row button {
+      border-radius: 999px;
+      border: none;
+      background: var(--yellow-main);
+      color: #422006;
+      font-weight: 600;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    footer {
+      padding: 20px 16px 26px;
+      font-size: 11px;
+      text-align: center;
+      color: #9ca3af;
+      border-top: 1px solid #111827;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 720px) {
+      .hero-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      main {
+        padding-top: 96px;
+      }
+
+      .navbar {
+        padding-inline: 12px;
+      }
+
+      .nav-links {
+        gap: 6px;
+        font-size: 11px;
+      }
+
+      .chatbot-window {
+        width: calc(100% - 32px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">TAXIUMS4</div>
+    <nav class="nav-links">
+      <button class="nav-link" onclick="scrollToSection('home')">Home</button>
+      <button class="nav-link" onclick="scrollToSection('planner')">Rit plannen</button>
+      <button class="nav-link" onclick="scrollToSection('berekenen')">Rit berekenen</button>
+      <button class="nav-link" onclick="scrollToSection('contact')">Contact</button>
+      <a class="nav-link primary" href="https://wa.me/31612345678" target="_blank">WhatsApp</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section id="home">
+      <span class="badge"><span class="badge-dot"></span> Slimme taxi planner & chatbot</span>
+      <h1>Plan je taxi­rit, bereken de prijs en stel vragen in de chatbot.</h1>
+      <p>
+        TAXIUMS4 helpt je om ritten te plannen, afstanden te berekenen en direct een indicatie van de
+        ritprijs te krijgen. Daarnaast kun je in de ingebouwde chatbot vragen stellen over je ritten,
+        prijzen of algemene informatie.
+      </p>
+
+      <div class="hero-grid">
+        <div class="hero-left">
+          <div class="card">
+            <h3>Hoe werkt het?</h3>
+            <p>
+              In drie stappen alles geregeld:
+            </p>
+            <ul style="padding-left: 18px; margin: 4px 0; font-size: 13px; color: #e5e7eb;">
+              <li><strong>1.</strong> Klik op de kaart om je rit (A → B) te kiezen.</li>
+              <li><strong>2.</strong> Bekijk afstand, reistijd en prijs.</li>
+              <li><strong>3.</strong> Stel vragen aan de chatbot of chat via WhatsApp.</li>
+            </ul>
+            <div class="pill-row">
+              <span class="pill">Geel thema</span>
+              <span class="pill">Routeplanner</span>
+              <span class="pill">Prijs indicatie</span>
+              <span class="pill">Slimme chatbot</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="card">
+            <h3>Voorbeeld gebruik</h3>
+            <p>
+              Klant belt of appt: "Wat kost een rit van Amsterdam naar Rotterdam?" – jij klikt A en B
+              op de kaart, de tool toont afstand en een indicatieprijs. De chatbot kan daarna vragen
+              beantwoorden over tarieven, wachttijd of algemene info.
+            </p>
+          </div>
+          <div class="card">
+            <h3>WhatsApp & chatbot</h3>
+            <p>
+              Rechts onderin zie je de TAXIUMS4 chatbot. Wil de klant liever direct met jou praten?
+              Dan gebruikt hij de WhatsApp-knop in het menu.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLANNER + KAART -->
+    <section id="planner">
+      <h2>Rit plannen op de kaart</h2>
+      <p class="hint">
+        Klik op de kaart om je rit te plannen:
+        <strong>1e klik</strong> = vertrekpunt (A),
+        <strong>2e klik</strong> = bestemming (B),
+        <strong>3e klik</strong> = reset.
+      </p>
+      <div id="map"></div>
+      <div class="whatsapp-bar">
+        <div>Wil je direct chatten? Klik op de WhatsApp-knop of gebruik de chatbot rechts onderin.</div>
+      </div>
+    </section>
+
+    <!-- RIT BEREKENEN -->
+    <section id="berekenen">
+      <h2>Rit berekenen</h2>
+      <p>
+        Gebruik de kaart hierboven of vul handmatig coördinaten in. De berekening gebruikt de route van
+        Google Maps (autoroute).
+      </p>
+      <div class="card">
+        <div class="form-grid">
+          <div>
+            <h3>Vertrekpunt (A)</h3>
+            <div class="field">
+              <label for="latA">Lat (breedtegraad)</label>
+              <input id="latA" type="number" step="0.000001" placeholder="Bijv. 52.370216" />
+            </div>
+            <div class="field">
+              <label for="lngA">Lng (lengtegraad)</label>
+              <input id="lngA" type="number" step="0.000001" placeholder="Bijv. 4.895168" />
+            </div>
+          </div>
+
+          <div>
+            <h3>Bestemming (B)</h3>
+            <div class="field">
+              <label for="latB">Lat (breedtegraad)</label>
+              <input id="latB" type="number" step="0.000001" placeholder="Bijv. 51.9225" />
+            </div>
+            <div class="field">
+              <label for="lngB">Lng (lengtegraad)</label>
+              <input id="lngB" type="number" step="0.000001" placeholder="Bijv. 4.47917" />
+            </div>
+          </div>
+
+          <div>
+            <h3>Tarief & resultaat</h3>
+            <div class="field">
+              <label for="prijsPerKm">Prijs per km (€)</label>
+              <input id="prijsPerKm" type="number" step="0.01" value="1.50" />
+            </div>
+            <button class="btn" onclick="berekenRit()">Bereken rit</button>
+            <button class="btn btn-ghost" type="button" onclick="resetForm()">Reset</button>
+
+            <div id="resultaat" class="result">
+              Nog geen berekening uitgevoerd.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>
+        Pas deze gegevens aan naar jouw eigen taxi­bedrijf. Klanten kunnen bellen, mailen of via
+        WhatsApp en de chatbot contact opnemen.
+      </p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Bedrijfsgegevens</h3>
+          <p><strong>Bedrijfsnaam:</strong> TAXIUMS4</p>
+          <p><strong>E-mail:</strong> info@taxiums4.nl (voorbeeld)</p>
+          <p><strong>Telefoon:</strong> 06-12345678 (voorbeeld)</p>
+        </div>
+        <div class="card">
+          <h3>Chat & support</h3>
+          <p>
+            Klanten kunnen direct klikken op:
+          </p>
+          <ul style="padding-left: 18px; margin: 4px 0; font-size: 13px; color: #e5e7eb;">
+            <li>De <strong>WhatsApp-knop</strong> rechtsboven.</li>
+            <li>De <strong>TAXIUMS4 chatbot</strong> rechtsonder.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © <span id="jaar"></span> TAXIUMS4 – Gele taxi planner & chatbot demo.
+  </footer>
+
+  <!-- CHATBOT UI -->
+  <div id="chatbotWindow" class="chatbot-window">
+    <div class="chatbot-header">
+      <div class="chatbot-header-title">
+        <strong>TAXIUMS4 chatbot</strong>
+        <span>Stel je vraag over ritten & prijzen</span>
+      </div>
+      <button class="chatbot-close" onclick="toggleChat(false)">×</button>
+    </div>
+    <div id="chatMessages" class="chatbot-messages"></div>
+    <div class="chatbot-input-row">
+      <input id="chatInput" type="text" placeholder="Typ je vraag..." onkeydown="if(event.key==='Enter'){verzendChat();}" />
+      <button onclick="verzendChat()">Stuur</button>
+    </div>
+  </div>
+
+  <div class="chatbot-toggle" onclick="toggleChat()">
+    <span>💬</span>
+  </div>
+
+  <script>
+    // Scroll helper
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      window.scrollTo({ top: el.offsetTop - 72, behavior: "smooth" });
+    }
+
+    document.getElementById("jaar").textContent = new Date().getFullYear();
+
+    // GOOGLE MAPS
+    let map;
+    let directionsService;
+    let directionsRenderer;
+    let klikTeller = 0;
+    let puntA = null;
+    let puntB = null;
+
+    function initMap() {
+      const start = { lat: 52.370216, lng: 4.895168 }; // Amsterdam
+
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: start,
+        zoom: 10,
+        disableDefaultUI: false,
+        mapTypeControl: false,
+      });
+
+      directionsService = new google.maps.DirectionsService();
+      directionsRenderer = new google.maps.DirectionsRenderer({ map });
+
+      map.addListener("click", (e) => handleMapClick(e.latLng));
+    }
+
+    function handleMapClick(latLng) {
+      klikTeller++;
+
+      if (klikTeller === 1) {
+        puntA = latLng;
+        puntB = null;
+        directionsRenderer.set("directions", null);
+
+        document.getElementById("latA").value = latLng.lat().toFixed(6);
+        document.getElementById("lngA").value = latLng.lng().toFixed(6);
+        document.getElementById("latB").value = "";
+        document.getElementById("lngB").value = "";
+        document.getElementById("resultaat").textContent =
+          "Vertrekpunt gekozen. Klik nog een keer voor de bestemming.";
+      } else if (klikTeller === 2) {
+        puntB = latLng;
+
+        document.getElementById("latB").value = latLng.lat().toFixed(6);
+        document.getElementById("lngB").value = latLng.lng().toFixed(6);
+
+        berekenRoute();
+      } else {
+        klikTeller = 0;
+        puntA = null;
+        puntB = null;
+        directionsRenderer.set("directions", null);
+        resetForm();
+        document.getElementById("resultaat").textContent =
+          "Kaart gereset. Klik opnieuw om een vertrekpunt te kiezen.";
+      }
+    }
+
+    function berekenRoute() {
+      if (!puntA || !puntB) return;
+
+      const request = {
+        origin: puntA,
+        destination: puntB,
+        travelMode: google.maps.TravelMode.DRIVING,
+      };
+
+      directionsService.route(request, (result, status) => {
+        if (status === "OK") {
+          directionsRenderer.setDirections(result);
+
+          const leg = result.routes[0].legs[0];
+          const afstandKm = (leg.distance.value / 1000).toFixed(2);
+          const duurMin = Math.round(leg.duration.value / 60);
+          const prijsPerKm = parseFloat(
+            document.getElementById("prijsPerKm").value
+          ) || 0;
+          const prijs = (afstandKm * prijsPerKm).toFixed(2);
+
+          document.getElementById("resultaat").innerHTML =
+            "Afstand: <span>" +
+            afstandKm +
+            " km</span><br/>Geschatte reistijd: <span>" +
+            duurMin +
+            " min</span><br/>Indicatie ritprijs: <span>€ " +
+            prijs +
+            "</span>";
+        } else {
+          document.getElementById("resultaat").textContent =
+            "Kon de route niet berekenen (" + status + ").";
+        }
+      });
+    }
+
+    function berekenRit() {
+      const latA = parseFloat(document.getElementById("latA").value);
+      const lngA = parseFloat(document.getElementById("lngA").value);
+      const latB = parseFloat(document.getElementById("latB").value);
+      const lngB = parseFloat(document.getElementById("lngB").value);
+
+      if (!isFinite(latA) || !isFinite(lngA) || !isFinite(latB) || !isFinite(lngB)) {
+        document.getElementById("resultaat").textContent =
+          "Vul geldige coördinaten in of kies punten via de kaart.";
+        return;
+      }
+
+      const origin = new google.maps.LatLng(latA, lngA);
+      const dest = new google.maps.LatLng(latB, lngB);
+
+      puntA = origin;
+      puntB = dest;
+      klikTeller = 2;
+      berekenRoute();
+    }
+
+    function resetForm() {
+      document.getElementById("latA").value = "";
+      document.getElementById("lngA").value = "";
+      document.getElementById("latB").value = "";
+      document.getElementById("lngB").value = "";
+      document.getElementById("resultaat").textContent =
+        "Nog geen berekening uitgevoerd.";
+    }
+
+    // EENVOUDIGE SLIMME CHATBOT (FRONTEND)
+    const startAntwoord =
+      "Hallo! Ik ben de TAXIUMS4 chatbot. Je kunt mij vragen stellen over ritten, prijzen, tarieven of algemene info.";
+
+    const faqs = [
+      {
+        trefwoorden: ["prijs", "kosten", "tarief"],
+        antwoord:
+          "De ritprijs wordt hier berekend op basis van afstand × prijs per kilometer. Vul je eigen tarief in bij 'Prijs per km'.",
+      },
+      {
+        trefwoorden: ["open", "tijd", "tijden", "24"],
+        antwoord:
+          "Je kunt dit systeem 24/7 gebruiken. Voor echte ritten kun je zelf je openingstijden invullen in de contactsectie.",
+      },
+      {
+        trefwoorden: ["route", "afstand", "km", "kilometer"],
+        antwoord:
+          "Klik op de kaart voor vertrek (A) en bestemming (B). De route, afstand en reistijd komen automatisch in de calculator terecht.",
+      },
+      {
+        trefwoorden: ["whatsapp", "app", "nummer"],
+        antwoord:
+          "Klik op de WhatsApp-knop bovenin om een gesprek in de normale WhatsApp-app te starten.",
+      },
+    ];
+
+    function toggleChat(force) {
+      const win = document.getElementById("chatbotWindow");
+      const isOpen = win.style.display === "flex";
+      const shouldOpen = force === undefined ? !isOpen : force;
+      win.style.display = shouldOpen ? "flex" : "none";
+
+      if (shouldOpen && !win.dataset.init) {
+        // eerste keer openen: startbericht
+        voegChatBericht("bot", startAntwoord);
+        win.dataset.init = "1";
+      }
+    }
+
+    function voegChatBericht(type, tekst) {
+      const container = document.getElementById("chatMessages");
+      const div = document.createElement("div");
+      div.className = "msg msg-" + type;
+      div.textContent = tekst;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function verzendChat() {
+      const input = document.getElementById("chatInput");
+      const tekst = input.value.trim();
+      if (!tekst) return;
+
+      voegChatBericht("user", tekst);
+      input.value = "";
+
+      // Simpele "slimme" logica: trefwoorden zoeken
+      const lower = tekst.toLowerCase();
+      let gevonden = null;
+      for (const item of faqs) {
+        if (item.trefwoorden.some((k) => lower.includes(k))) {
+          gevonden = item.antwoord;
+          break;
+        }
+      }
+
+      if (!gevonden) {
+        gevonden =
+          "Ik probeer zoveel mogelijk te helpen. Gebruik de ritplanner voor afstand & prijs, of stel je vraag zo concreet mogelijk (bijvoorbeeld: 'Wat kost een rit van A naar B?').";
+      }
+
+      setTimeout(() => {
+        voegChatBericht("bot", gevonden);
+      }, 400);
+    }
+  </script>
+
+  <!-- GOOGLE MAPS SCRIPT -->
+  <!-- VERVANG JOUW_API_KEY_HIER DOOR JE ECHTE, BEPERKTE GOOGLE MAPS API KEY -->
+  <script
+    async
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key=JOUW_API_KEY_HIER&callback=initMap"
+  ></script>
+</body>
+</html>
